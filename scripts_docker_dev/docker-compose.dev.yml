@@ -1,0 +1,48 @@
+version: "3.9"
+# https://github.com/security-union/yew-actix-template/blob/main/docker/docker-compose.yaml
+services:
+  client:
+    build:
+      context: ../client
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    container_name: client
+    environment:
+      - TRUNK_SERVE_PORT=8080
+    volumes:
+      - "../client:/app"
+      
+    
+    # environment:
+    #   - NODE_ENV=development
+  api:
+    build:
+      context: ../api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    # depends_on:
+    #   - db
+    container_name: api
+    restart: always
+    volumes:
+      - "../api:/app"
+    # environment:
+    #   - NODE_ENV=development
+  gateway:
+    build:
+      context: ../gateway
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - api
+      - client
+      - db
+    ports:
+      - "80:80"
+    container_name: gateway
+  db:
+    build:
+      context: ../db
+      dockerfile: Dockerfile.dev
+    container_name: db
